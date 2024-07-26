@@ -13,11 +13,13 @@ In dev
 ## Output
 Dose decision will be decided from four possible choices(Suspend, De-escalation, Stay, Escalation). The recommended dose assignment for the current patient will also be given.
 
+
+## Algortihm of POD-TPI
 ![](Algorithm.png)
 
 
 
-### Package Requirement
+## Package Requirement
 Run the following code in R:
 
 ```
@@ -35,7 +37,7 @@ packages_to_check <- c("shiny", "dfcrm", "BOIN", "truncdist",
 install_missing_packages(packages_to_check)
 ```
 
-### Run POD-TPI
+## Run POD-TPI
 
 ```
 library(shiny)
