@@ -207,7 +207,7 @@ POD_TPI_prob <- function(current_dose, W, MaxDose,
         if(type_suspension == 2 & prob_dose_decisions[1] > q2 & current_dose != 1){
           
           # SUSPEND
-            return(sprintf("Patien SUSPEND. Current dose %d, n %d, m %d, r %d.\n", 
+            return(sprintf("Patient SUSPEND. Current dose %d, n %d, m %d, r %d.\n", 
                         current_dose, n_d, m_d, r_d))
 
           
