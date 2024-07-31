@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ziyu Liu" />
+
+
+<title>vignette</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">vignette</h1>
+<h4 class="author">Ziyu Liu</h4>
+
+
+
+<div id="xxx-package-vignette" class="section level2">
+<h2>XXX Package Vignette</h2>
+<div id="dependencies" class="section level3">
+<h3>Dependencies</h3>
+<p>The following packages are required for functions and examples in the
+XXX package: dfcrm, BOIN, truncdist, MCMCpack, poisbinom, zoo. All of
+these required packages are available on CRAN.</p>
+</div>
+</div>
+<div id="pod-tpi-probability-of-decision-toxicity-probability-interval-design-to-accelerate-phase-i-trials" class="section level2">
+<h2>PoD-TPI: Probability-of-Decision Toxicity Probability Interval
+Design to Accelerate Phase I Trials</h2>
+<p>The ‘POD_TPI_prob’ function determines whether
+suspend/de-escalation/stay/escalation should be applied to the current
+dose level by calculating the posterior distribution of a dose
+assignment decision in the presence of pending toxicity outcomes.</p>
+<div id="example-dataset" class="section level3">
+<h3>Example Dataset</h3>
+<p>We will use the dataset in the Fig.1(a) of the PoD-TPI paper. The
+input dataset ‘df’ should include at least three columns: ‘dose’,
+‘event_time’ and ‘event’. Suppose that you are assigning a dose level to
+the nth patient of the trial, the ‘dose’ column should contain the dose
+level history of all past (n-1) patients and the ‘event_time’ column
+should contain the time to event(DLT here) observed for all past (n-1)
+patients, and the ‘event’ column should contain whether event is
+observed on each patient.</p>
+<p>There are several restrictions here. First, The input dataset should
+be arranged according to the order of patient recruitment. Patients
+recruited later need to be placed later in the dataset. Second, the
+‘event_time’ variable must be less than or equal to the DLT assessment
+window. If DLT is not observed on a patient within the assessment
+window, the event_time should be equal to assessment window. Third, for
+patients with pending outcomes, their ‘event’ variable should be NA and
+their ‘event_time’ variables are the pending follow-up times.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">dose =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>                 <span class="at">event_time =</span> <span class="fu">c</span>(<span class="dv">28</span>, <span class="dv">28</span>, <span class="dv">9</span>, <span class="dv">26</span>, <span class="dv">15</span>, <span class="dv">8</span>),</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>                 <span class="at">event =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="cn">NA</span>, <span class="cn">NA</span>))</span></code></pre></div>
+</div>
+<div id="other-parameters" class="section level3">
+<h3>Other Parameters</h3>
+<p><strong>current_dose:</strong> current dose assignment for the
+incoming patient.</p>
+<p><strong>W:</strong> DLT assessment window.</p>
+<p><strong>MaxDose:</strong> max dose level of the trial.</p>
+<p><strong>p_T:</strong> target DLT rate.</p>
+<p><strong>epsilon:</strong> 2 dimensional vector, the bounds of the
+equivalence interval.</p>
+<p><strong>niter:</strong> number of iterations for MCMC sampling,
+greater the better, &gt; 1000 recommended.</p>
+<p><strong>type_dose_decision:</strong> Can be “mTPI” or “i3+3”, the
+base complete data dose decision</p>
+<p><strong>type_suspension:</strong> Three types of suspension
+rules.</p>
+<p>= 0: Never suspends</p>
+<p>= 1: Suspend if r_d &gt; (n_d + m_d + r_d) / 2</p>
+<p>= 2: Suspend based on probability thresholds</p>
+<p>= 3: Suspend if Pr(decision) &lt; 1, i.e., “look-ahead” design</p>
+<p>Suppose n_d is the number of DLT patients observed and m_d is the
+number of non-DLT patients observed and r_d is the number of pending
+patients</p>
+<ol style="list-style-type: decimal">
+<li><p>if no observed outcome at current dose (n_d + m_d = 0), always
+stay. when suspension type is 2, if r_d &gt;= 3 and n_d + m_d = 0, also
+suspend</p></li>
+<li><p>if m_d = 0, no non-DLTs, for suspension rules 0 or 1, if decision
+is E, change to S. for suspension rule 2, if decision is E,
+suspend</p></li>
+</ol>
+<p><strong>type_safety:</strong> Three types of safety rules.</p>
+<p>= 0: No safety rule</p>
+<p>= 1: Only early termination</p>
+<p>= 2: Both safety rules</p>
+<p><strong>q1:</strong> pi_E for Trial Suspension, must be within [0.33,
+1], &gt; 0.8 recommended. A larger pi_E represents more conservative
+dose escalations.</p>
+<p><strong>q2:</strong> pi_D for Trial Suspension, must be within [0,
+0.5], &lt;= 0.25 recommended. A smaller pi_D represents more
+conservative stays.</p>
+</div>
+<div id="run-pod-tpi" class="section level3">
+<h3>Run POD-TPI</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">POD_TPI_df</span>(df, <span class="at">current_dose =</span> <span class="dv">2</span>, <span class="at">W =</span> <span class="dv">28</span>, <span class="at">MaxDose =</span> <span class="dv">4</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>           <span class="at">p_T =</span> <span class="fl">0.3</span>, <span class="at">epsilon =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.05</span>), </span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>           <span class="at">niter =</span> <span class="dv">1000</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>           <span class="at">type_dose_decision =</span> <span class="st">&quot;mTPI&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>           <span class="at">type_p_prior =</span> <span class="st">&quot;uniform&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>           <span class="at">type_t_model =</span> <span class="st">&quot;pwuniform&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>           <span class="at">type_suspension =</span> <span class="dv">2</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>           <span class="at">type_safety =</span> <span class="dv">2</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>           <span class="at">q1 =</span> <span class="dv">1</span>, <span class="at">q2 =</span> <span class="fl">0.15</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Dose decision: De-escalation. Dose assignment for this patient: 1&quot;</code></pre>
+<p>Dose decision will be decided from four possible choices(Suspend,
+De-escalation, Stay, Escalation). The recommended dose assignment for
+the current patient will also be given.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -18,8 +18,8 @@
 # type_suspension = 2
 # q1 = 0
 # q2 = 0.15
-# 
-# 
+# # 
+# # 
 # POD_TPI_prob(current_dose, W, MaxDose,
 #              dose_vec, event_time_vec, event_vec,
 #              n_d, m_d, r_d, p_T, epsilon,
@@ -29,7 +29,63 @@
 #              type_suspension = 2,
 #              q1 = 0, q2 = 0.15)
 
-POD_TPI_prob <- function(current_dose, W, MaxDose, 
+POD_TPI_df <- function(df, current_dose, W, MaxDose,
+                       p_T, epsilon = c(0.05, 0.05), 
+                       niter = 1000,
+                       type_dose_decision = "mTPI",
+                       type_p_prior = "uniform",
+                       type_t_model = "pwuniform",
+                       type_suspension = 2,
+                       type_safety = 2,
+                       q1 = 1, q2 = 0.15){
+  dose_vec <- df$dose
+  event_time_vec <- df$event_time
+  event_vec <- df$event
+  n_d <- sum(event_vec == 1, na.rm = TRUE)
+  m_d <- sum(event_vec == 0, na.rm = TRUE)
+  r_d <- sum(is.na(event_vec))
+  
+  ## For the nth element in the event_vec, if it's equal to one or NA, the nth element in the event_time_vec should be less than W and if it's equal to 0, the nth element in the event_time_vec should equal to 28.
+  validate_lists <- function(list1, list2, W) {
+    if (length(list1) != length(list2)) {
+      stop("The two lists must have equal length.")
+    }
+    
+    is_valid <- TRUE
+    for (i in seq_along(list1)) {
+      if (is.na(list1[[i]]) || list1[[i]] == 1) {
+        if (list2[[i]] >= W) {
+          is_valid <- FALSE
+          break
+        }
+      } else if (list1[[i]] == 0) {
+        if (list2[[i]] != W) {
+          is_valid <- FALSE
+          break
+        }
+      }
+    }
+    
+    return(is_valid)
+  }
+
+  stopifnot(validate_lists(event_vec, event_time_vec, W))
+  
+  return(POD_TPI_decision(current_dose, W, MaxDose, 
+                          dose_vec, event_time_vec, event_vec,
+                          n_d, m_d, r_d, p_T, epsilon = c(0.05, 0.05), 
+                          niter = 1000,
+                          type_dose_decision = "mTPI",
+                          type_p_prior = "uniform",
+                          type_t_model = "pwuniform",
+                          type_suspension = 2,
+                          type_safety = 2,
+                          q1 = 1, q2 = 0.15))
+}
+
+
+
+POD_TPI_decision <- function(current_dose, W, MaxDose, 
                          dose_vec, event_time_vec, event_vec,
                          n_d, m_d, r_d, p_T, epsilon = c(0.05, 0.05), 
                          niter = 1000,
@@ -37,7 +93,23 @@ POD_TPI_prob <- function(current_dose, W, MaxDose,
                          type_p_prior = "uniform",
                          type_t_model = "pwuniform",
                          type_suspension = 2,
-                         q1 = 0, q2 = 0.15){
+                         type_safety = 2,
+                         q1 = 1, q2 = 0.15){
+  
+  stopifnot(all(sapply(list(current_dose, W, MaxDose, n_d, m_d, r_d), is.numeric)),
+            current_dose > 0, W > 0, MaxDose > 0, current_dose <= MaxDose,
+            length(dose_vec) == length(event_time_vec) & length(dose_vec) == length(event_vec),
+            all(sapply(dose_vec, function(x) x > 0 & x <= MaxDose)),
+            all(sapply(event_time_vec, function(x) x > 0 & x <= W)),
+            all(event_vec %in% c(0,1,NA)),
+            n_d >= 0, m_d >= 0, r_d >= 0, p_T <= 1 & p_T >= 0,
+            (p_T - epsilon[1]) >= 0 & (p_T + epsilon[2]) <= 1,
+            niter >= 10, type_dose_decision %in% c("mTPI", "i3+3"),
+            type_p_prior %in% c("uniform", "semiparametric"),
+            type_t_model %in% c("pwuniform", "i3+3"),
+            type_suspension %in% 0:3,
+            q1 <= 1 & q1 >= 0.33, q2 <= 0.5 & q2>= 0)
+  
   
   z = dose_vec
   v = event_time_vec
@@ -53,6 +125,34 @@ POD_TPI_prob <- function(current_dose, W, MaxDose,
     hp$c = 1
   }
   
+  # ?which.min
+  # n_1 = sum(dose_vec == 1)
+  # m_1 = sum(dose_vec == 0)
+  # 
+  # n_m_1 = n_1 + m_1
+  # 
+  # 
+  # safety_bound = pbeta(p_T, shape1 = n_d+1, shape2 = m_d+1)
+  # EarlyStop_trigger = (n_m >= 3 & safety_bound < 0.05)
+  # 
+  # if((type_safety %in% 1:2) & EarlyStop_trigger){
+  #   
+  #   if(pbeta(p_T, shape1 = n_1 + 1, shape2 = m_vec[1] + r_vec[1] +1) < 0.05){
+  #     
+  #     EarlyStop = 1
+  #     break
+  #     
+  #   } else {
+  #     
+  #     
+  #       cat(sprintf("Patient %d (%d), accrual: %.2f, SUSPEND. First dose n %d, m %d, r %d.\n", 
+  #                   i, j, accrual_time[i], n_vec[1], m_vec[1], r_vec[1]))
+  #     
+  #    
+  #     
+  #   }
+  #   
+  # }
   
   if(r_d == 0){
     
@@ -190,7 +290,7 @@ POD_TPI_prob <- function(current_dose, W, MaxDose,
       
       if(dose_decisions[max_index] == 1){
         
-        if( type_suspension == 2 & max_prob < (1 - q1) ){
+        if( type_suspension == 2 & max_prob < q1 ){
           
           # SUSPEND
             return(sprintf("Patient SUSPEND. Current dose %d, n %d, m %d, r %d.\n", 

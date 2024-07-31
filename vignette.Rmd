@@ -1,8 +1,29 @@
+---
+title: "vignette"
+output: rmarkdown::html_vignette
+author: Ziyu Liu
+date: \today
+vignette: > 
+  %\VignetteIndexEntry{MiRKAT Package Vignette} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  \usepackage[utf8]{inputenc}
+---
+
+## XXX Package Vignette
+
+
+### Dependencies
+The following packages are required for functions and examples in the XXX package: dfcrm, BOIN, truncdist,  MCMCpack, poisbinom, zoo. All of these required packages are available on CRAN.
+
+
+
 ## PoD-TPI: Probability-of-Decision Toxicity Probability Interval Design to Accelerate Phase I Trials
+The 'POD_TPI_prob' function determines whether suspend/de-escalation/stay/escalation should be applied to the current dose level by calculating the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes.
 
-### Introduction
-
-We have proposed the PoD-TPI design to accelerate phase I trials and have developed a statistical methodology to calculate the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes. The posterior distribution directly reflects the confidence of all possible decisions, and the optimal decision is computed under a decision-theoretic framework. The PoD-TPI design is built upon the mTPI-2 design. Nevertheless, the proposed strategy can be applied to other model-free or model-assisted designs such as 3+3, BOIN, keyboard or i3+3.
+```{r, include = FALSE}
+source("POD-TPI_prob.R")
+source("TITE-setup.R")
+```
 
 
 ### Example Dataset 
@@ -10,7 +31,7 @@ We will use the dataset in the Fig.1(a) of the PoD-TPI paper. The input dataset 
 
 There are several restrictions here. First, The input dataset should be arranged according to the order of patient recruitment. Patients recruited later need to be placed later in the dataset. Second, the 'event_time' variable must be less than or equal to the DLT assessment window. If DLT is not observed on a patient within the assessment window, the event_time should be equal to assessment window. Third, for patients with pending outcomes, their 'event' variable should be NA and their 'event_time' variables are the pending follow-up times.
 
-```
+```{r}
 df <- data.frame(dose = c(1, 2, 2, 2, 2, 2),
                  event_time = c(28, 28, 9, 26, 15, 8),
                  event = c(0, 0, 1, 1, NA, NA))
@@ -66,7 +87,7 @@ Suppose n_d is the number of DLT patients observed and m_d is the number of non-
 
 
 ### Run POD-TPI
-```
+```{r}
 POD_TPI_df(df, current_dose = 2, W = 28, MaxDose = 4,
            p_T = 0.3, epsilon = c(0.05, 0.05), 
            niter = 1000,
@@ -76,40 +97,6 @@ POD_TPI_df(df, current_dose = 2, W = 28, MaxDose = 4,
            type_suspension = 2,
            type_safety = 2,
            q1 = 1, q2 = 0.15)
-
-## [1] "Dose decision: De-escalation. Dose assignment for this patient: 1"
 ```
 
-### Output
 Dose decision will be decided from four possible choices(Suspend, De-escalation, Stay, Escalation). The recommended dose assignment for the current patient will also be given.
-
-
-## Algortihm of POD-TPI
-![](Algorithm.png)
-
-
-
-### Package Requirement
-Run the following code in R:
-
-```
-install_missing_packages <- function(packages) {
-  for (pkg in packages) {
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-      install.packages(pkg)
-    }
-  }
-}
-
-packages_to_check <- c("shiny", "dfcrm", "BOIN", "truncdist", 
-                        "MCMCpack", "poisbinom", "zoo")
-
-install_missing_packages(packages_to_check)
-```
-
-### POD-TPI R Shiny App
-
-```
-library(shiny)
-runGitHub("POD-TPI", "Ziyu-Liu-WCM")
-```

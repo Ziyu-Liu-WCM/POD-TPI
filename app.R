@@ -42,7 +42,7 @@ ui <- fluidPage(
       selectInput("type_p_prior", "Type P Prior:", choices = c("uniform", "semiparametric"), selected = "uniform"),
       selectInput("type_t_model", "Type T Model:", choices = c("uniform", "pwuniform", "dhazard", "pwhazard"), selected = "pwuniform"),
       numericInput("type_suspension", "Type of Suspension:", value = 2),
-      numericInput("q1", "(1 - pi_E) for Trial Suspension:", value = 0),
+      numericInput("q1", "pi_E for Trial Suspension:", value = 1),
       numericInput("q2", "pi_D for Trial Suspension:", value = 0.15),
       actionButton("compute", "Compute")
     ),
