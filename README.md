@@ -84,7 +84,7 @@ POD_TPI_df(df, current_dose = 2, W = 28, MaxDose = 4,
 Dose decision will be decided from four possible choices(Suspend, De-escalation, Stay, Escalation). The recommended dose assignment for the current patient will also be given.
 
 
-## Algortihm of POD-TPI
+### Algortihm of POD-TPI
 ![](Algorithm.png)
 
 
