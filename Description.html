@@ -8,14 +8,117 @@ have developed a statistical methodology to calculate the posterior
 distribution of a dose assignment decision in the presence of pending
 toxicity outcomes. The posterior distribution directly reflects the
 confidence of all possible decisions, and the optimal decision is
-computed under a decision-theoretic framework. The PoD-TPI design is
-built upon the mTPI-2 design. Nevertheless, the proposed strategy can be
-applied to other model-free or model-assisted designs such as 3+3, BOIN,
-keyboard or i3+3.</p>
+computed under a decision-theoretic framework. The
+<strong><code>PoD-TPI</code></strong> design is built upon the
+<strong><code>mTPI-2</code></strong> design. Nevertheless, the proposed
+strategy can be applied to the <strong><code>i3+3</code></strong>
+design.</p>
 </div>
-<div id="user-provided-inputs" class="section level2">
-<h2>User-provided inputs</h2>
-<p>In dev</p>
+<div id="input-parameters" class="section level2">
+<h2>Input Parameters</h2>
+<p><strong>Current Dose:</strong> Current dose assignment for the
+incoming patient.</p>
+<p><strong>DLT Assessment Window:</strong> Length of time window for DLT
+assessment.</p>
+<p><strong>Max Dose:</strong> Max dose level of the trial.</p>
+<p><strong>Dose Vector:</strong> Does level history of the trial, must
+be comma-separated.</p>
+<p><strong>Event Time Vector:</strong> Time to event history of the
+trial, must be comma-separated. For non-DLT patients, must be equal to
+the DLT Assessment Window.</p>
+<p><strong>Event Vector:</strong> Event history of the trial, must be
+comma-separated. 1 for DLT patients, 0 for non-DLT patients and NA for
+pending patients.</p>
+<p><strong>DLT Patients:</strong> Number of observed DLT patients.</p>
+<p><strong>non-DLT Patients:</strong> Number of observed non-DLT
+patients.</p>
+<p><strong>Pending Patients:</strong> Number of pending patients.</p>
+<p><strong>Target DLT Rate:</strong> Target DLT rate of the
+trial(p_T).</p>
+<p><strong>Type Dose Decision:</strong> Supports both
+<strong>“mTPI”</strong> and <strong>“i3+3”</strong>, the base complete
+data dose decision</p>
+<p><strong>Type Safety:</strong> Three types of safety rules.</p>
+<p>= 0: No safety rule</p>
+<p>= 1: Only early termination</p>
+<p>= 2: Both safety rules</p>
+<div id="p_prior-setting" class="section level4">
+<h4><strong>p_prior Setting</strong></h4>
+<p>The <code>Type P Prior</code> parameter defines the prior
+distribution for the probability of experiencing a DLT at each dose
+level. There are two main options for <code>p_prior</code>:</p>
+<ul>
+<li><p><strong><code>p_prior = &quot;uniform&quot;</code></strong>: This setting
+assumes a uniform prior distribution, meaning that initially, all dose
+levels are considered equally likely to be associated with a DLT. This
+is a non-informative prior, implying that no strong assumptions are made
+about the DLT probabilities before observing the data. This approach is
+often used when there is limited prior knowledge about the toxicity of
+the doses.</p></li>
+<li><p><strong><code>p_prior = &quot;semiparametric&quot;</code></strong>: This
+setting uses a semiparametric prior distribution, which is more flexible
+and can incorporate prior beliefs or information about the DLT
+probabilities at different dose levels. In this case, the prior
+distribution is partially informed by a set of hyperparameters, such as
+<code>theta</code>, which reflects prior knowledge about the true
+maximum tolerated dose (MTD), and <code>c</code>, which controls the
+strength of this prior belief.</p></li>
+</ul>
+</div>
+<div id="t_model-setting" class="section level4">
+<h4><strong>t_model Setting</strong></h4>
+<p>The <code>Type T Model</code> parameter specifies the model used for
+the time-to-toxicity (the time until a patient experiences a DLT).
+Different models can be chosen to reflect various assumptions about how
+the risk of toxicity changes over time:</p>
+<ul>
+<li><p><strong><code>t_model = &quot;uniform&quot;</code></strong>: This setting
+assumes that the risk of experiencing a DLT is uniformly distributed
+over the assessment window <code>W</code>. In other words, the
+probability of experiencing a DLT is constant over time.</p></li>
+<li><p><strong><code>t_model = &quot;pwuniform&quot;</code></strong>: This setting
+assumes a piecewise-uniform distribution for time-to-toxicity. The
+assessment window <code>W</code> is divided into <code>K</code>
+intervals defined by the vector <code>h</code>, and within each
+interval, the probability of experiencing a DLT is constant but may
+differ between intervals. This allows the model to capture changes in
+risk over time more flexibly than the uniform model.</p></li>
+<li><p><strong><code>t_model = &quot;dhazard&quot;</code></strong>: This setting
+uses a discrete hazard model for time-to-toxicity. The hazard (or risk)
+of experiencing a DLT can vary at discrete time points within the
+assessment window. This model is useful when the risk of DLT might
+change abruptly at specific times, rather than continuously.</p></li>
+<li><p><strong><code>t_model = &quot;pwhazard&quot;</code></strong>: This setting
+assumes a piecewise constant hazard model, where the risk of DLT is
+constant within each interval defined by <code>h</code>, but can change
+between intervals. This is similar to <code>pwuniform</code>, but
+focuses on the hazard rate rather than the probability of
+toxicity.</p></li>
+</ul>
+<p><strong>Type of Suspension:</strong> Three types of suspension
+rules.</p>
+<p>= 0: Never suspends</p>
+<p>= 1: Suspend if r_d &gt; (n_d + m_d + r_d) / 2</p>
+<p>= 2: Suspend based on probability thresholds</p>
+<p>= 3: Suspend if Pr(decision) &lt; 1, i.e., “look-ahead” design</p>
+<p>Suppose n_d is the number of DLT patients observed and m_d is the
+number of non-DLT patients observed and r_d is the number of pending
+patients</p>
+<ol style="list-style-type: decimal">
+<li><p>if no observed outcome at current dose (n_d + m_d = 0), always
+stay. when suspension type is 2, if r_d &gt;= 3 and n_d + m_d = 0, also
+suspend</p></li>
+<li><p>if m_d = 0, no non-DLTs, for suspension rules 0 or 1, if decision
+is E, change to S. for suspension rule 2, if decision is E,
+suspend</p></li>
+</ol>
+<p><strong>pi_E for Trial Suspension:</strong> must be within [0.33, 1],
+&gt; 0.8 recommended. A larger pi_E represents more conservative dose
+escalations.</p>
+<p><strong>pi_D for Trial Suspension:</strong> must be within [0, 0.5],
+&lt;= 0.25 recommended. A smaller pi_D represents more conservative
+stays.</p>
+</div>
 </div>
 <div id="output" class="section level2">
 <h2>Output</h2>

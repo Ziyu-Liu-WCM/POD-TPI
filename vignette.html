@@ -360,24 +360,28 @@ dose level by calculating the posterior distribution of a dose
 assignment decision in the presence of pending toxicity outcomes.</p>
 <div id="example-dataset" class="section level3">
 <h3>Example Dataset</h3>
-<p>We will use the dataset in the Fig.1(a) of the PoD-TPI paper. The
-input dataset ‘df’ should include at least three columns: ‘dose’,
-‘event_time’ and ‘event’. Suppose that you are assigning a dose level to
-the nth patient of the trial, the ‘dose’ column should contain the dose
-level history of all past (n-1) patients and the ‘event_time’ column
-should contain the time to event(DLT here) observed for all past (n-1)
-patients, and the ‘event’ column should contain whether event is
-observed on each patient.</p>
+<p>We will use a dataset similar to the one in the Fig.1(a) of the
+PoD-TPI paper. The input dataset <strong><code>df</code></strong> should
+include at least three columns: <strong><code>dose</code></strong>,
+<strong><code>event_time</code></strong> and
+<strong><code>event</code></strong>. Suppose that you are assigning a
+dose level to the nth patient of the trial, the ‘dose’ column should
+contain the dose level history of all past (n-1) patients and the
+‘event_time’ column should contain the time to event(DLT here) observed
+for all past (n-1) patients, and the ‘event’ column should contain
+whether event is observed on each patient.</p>
 <p>There are several restrictions here. First, The input dataset should
 be arranged according to the order of patient recruitment. Patients
 recruited later need to be placed later in the dataset. Second, the
-‘event_time’ variable must be less than or equal to the DLT assessment
-window. If DLT is not observed on a patient within the assessment
-window, the event_time should be equal to assessment window. Third, for
-patients with pending outcomes, their ‘event’ variable should be NA and
-their ‘event_time’ variables are the pending follow-up times.</p>
+<strong><code>event_time</code></strong> variable must be less than or
+equal to the DLT assessment window. If DLT is not observed on a patient
+within the assessment window, the event_time should be equal to
+assessment window. Third, for patients with pending outcomes, their
+<strong><code>event</code></strong> variable should be NA and their
+<strong><code>event_time</code></strong> variables are the pending
+follow-up times.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">dose =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>),</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>                 <span class="at">event_time =</span> <span class="fu">c</span>(<span class="dv">28</span>, <span class="dv">28</span>, <span class="dv">9</span>, <span class="dv">26</span>, <span class="dv">15</span>, <span class="dv">8</span>),</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>                 <span class="at">event_time =</span> <span class="fu">c</span>(<span class="dv">28</span>, <span class="dv">28</span>, <span class="dv">9</span>, <span class="dv">26</span>, <span class="dv">15</span>, <span class="dv">9</span>),</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>                 <span class="at">event =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="cn">NA</span>, <span class="cn">NA</span>))</span></code></pre></div>
 </div>
 <div id="other-parameters" class="section level3">
@@ -391,8 +395,9 @@ incoming patient.</p>
 equivalence interval.</p>
 <p><strong>niter:</strong> number of iterations for MCMC sampling,
 greater the better, &gt; 1000 recommended.</p>
-<p><strong>type_dose_decision:</strong> Can be “mTPI” or “i3+3”, the
-base complete data dose decision</p>
+<p><strong>type_dose_decision:</strong> Supports both
+<strong>“mTPI”</strong> and <strong>“i3+3”</strong>, the base complete
+data dose decision</p>
 <p><strong>type_suspension:</strong> Three types of suspension
 rules.</p>
 <p>= 0: Never suspends</p>
@@ -420,10 +425,83 @@ dose escalations.</p>
 <p><strong>q2:</strong> pi_D for Trial Suspension, must be within [0,
 0.5], &lt;= 0.25 recommended. A smaller pi_D represents more
 conservative stays.</p>
+<div id="p_prior-setting" class="section level4">
+<h4><strong>p_prior Setting</strong></h4>
+<p>The <code>p_prior</code> parameter defines the prior distribution for
+the probability of experiencing a DLT at each dose level. There are two
+main options for <code>p_prior</code>:</p>
+<ul>
+<li><p><strong><code>p_prior = &quot;uniform&quot;</code></strong>: This setting
+assumes a uniform prior distribution, meaning that initially, all dose
+levels are considered equally likely to be associated with a DLT. This
+is a non-informative prior, implying that no strong assumptions are made
+about the DLT probabilities before observing the data. This approach is
+often used when there is limited prior knowledge about the toxicity of
+the doses.</p></li>
+<li><p><strong><code>p_prior = &quot;semiparametric&quot;</code></strong>: This
+setting uses a semiparametric prior distribution, which is more flexible
+and can incorporate prior beliefs or information about the DLT
+probabilities at different dose levels. In this case, the prior
+distribution is partially informed by a set of hyperparameters, such as
+<code>theta</code>, which reflects prior knowledge about the true
+maximum tolerated dose (MTD), and <code>c</code>, which controls the
+strength of this prior belief.</p></li>
+</ul>
+</div>
+<div id="t_model-setting" class="section level4">
+<h4><strong>t_model Setting</strong></h4>
+<p>The <code>t_model</code> parameter specifies the model used for the
+time-to-toxicity (the time until a patient experiences a DLT). Different
+models can be chosen to reflect various assumptions about how the risk
+of toxicity changes over time:</p>
+<ul>
+<li><p><strong><code>t_model = &quot;uniform&quot;</code></strong>: This setting
+assumes that the risk of experiencing a DLT is uniformly distributed
+over the assessment window <code>W</code>. In other words, the
+probability of experiencing a DLT is constant over time.</p></li>
+<li><p><strong><code>t_model = &quot;pwuniform&quot;</code></strong>: This setting
+assumes a piecewise-uniform distribution for time-to-toxicity. The
+assessment window <code>W</code> is divided into <code>K</code>
+intervals defined by the vector <code>h</code>, and within each
+interval, the probability of experiencing a DLT is constant but may
+differ between intervals. This allows the model to capture changes in
+risk over time more flexibly than the uniform model.</p></li>
+<li><p><strong><code>t_model = &quot;dhazard&quot;</code></strong>: This setting
+uses a discrete hazard model for time-to-toxicity. The hazard (or risk)
+of experiencing a DLT can vary at discrete time points within the
+assessment window. This model is useful when the risk of DLT might
+change abruptly at specific times, rather than continuously.</p></li>
+<li><p><strong><code>t_model = &quot;pwhazard&quot;</code></strong>: This setting
+assumes a piecewise constant hazard model, where the risk of DLT is
+constant within each interval defined by <code>h</code>, but can change
+between intervals. This is similar to <code>pwuniform</code>, but
+focuses on the hazard rate rather than the probability of
+toxicity.</p></li>
+</ul>
+</div>
+</div>
+<div id="safety-rules" class="section level3">
+<h3>Safety Rules</h3>
+<p><strong>Safety rule 1 (early termination)</strong>: At the lowest
+dose level and any moment in the trial, when there are &gt;= 3 patients
+with observed outcomes(n_1 + m_1 &gt;= 3), if the probability of the
+patient having a DLT probability greater than the target probability p_T
+is greater than 0.95, even counting pending patients as non-DLT, the
+trial should be terminated: <span class="math display">\[\Pr(p_1 &gt;
+p_T \mid n_1, m_1+r_1) &gt; 0.95\]</span></p>
+<p><strong>Otherwise</strong> if not counting pending patients as
+non-DLT, the trial should be suspended: <span class="math display">\[\Pr(p_1 &gt; p_T \mid n_1, m_1) &gt;
+0.95\]</span></p>
+<p><strong>Safety rule 2 (dose exclusion)</strong>: At any dose level d
+and any moment in the trial, when there are &gt;= 3 patients with
+observed outcomes(n_d + m_d &gt;= 3), if the probability of the patient
+having a DLT probability greater than the target probability p_T is
+greater than 0.95, Suspend dose d and higher doses from the trial: <span class="math display">\[\Pr(p_d &gt; p_T \mid n_d, m_d) &gt;
+0.95\]</span></p>
 </div>
 <div id="run-pod-tpi" class="section level3">
 <h3>Run POD-TPI</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">POD_TPI_df</span>(df, <span class="at">current_dose =</span> <span class="dv">2</span>, <span class="at">W =</span> <span class="dv">28</span>, <span class="at">MaxDose =</span> <span class="dv">4</span>,</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">POD_TPI_df</span>(df, <span class="at">W =</span> <span class="dv">28</span>, <span class="at">MaxDose =</span> <span class="dv">4</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>           <span class="at">p_T =</span> <span class="fl">0.3</span>, <span class="at">epsilon =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.05</span>), </span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>           <span class="at">niter =</span> <span class="dv">1000</span>,</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>           <span class="at">type_dose_decision =</span> <span class="st">&quot;mTPI&quot;</span>,</span>
@@ -432,7 +510,17 @@ conservative stays.</p>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>           <span class="at">type_suspension =</span> <span class="dv">2</span>,</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>           <span class="at">type_safety =</span> <span class="dv">2</span>,</span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>           <span class="at">q1 =</span> <span class="dv">1</span>, <span class="at">q2 =</span> <span class="fl">0.15</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;Dose decision: De-escalation. Dose assignment for this patient: 1&quot;</code></pre>
+<pre><code>## $Decision
+## [1] &quot;Dose decision: De-escalation. Dose assignment for this patient: 1. Current dose: 2, DLT Patients: 2, Non-DLT Patients: 2, Pending Patients: 2.&quot;
+## 
+## $`Probability of De-escalation`
+## [1] 0.6902344
+## 
+## $`Probability of Stay`
+## [1] 0.3097656
+## 
+## $`Probability of Escalation`
+## [1] 0</code></pre>
 <p>Dose decision will be decided from four possible choices(Suspend,
 De-escalation, Stay, Escalation). The recommended dose assignment for
 the current patient will also be given.</p>

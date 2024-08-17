@@ -25,7 +25,6 @@ ui <- fluidPage(
   tabPanel("Main",
   sidebarLayout(
     sidebarPanel(
-      numericInput("current_dose", "Current Dose:", value = 2),
       numericInput("W", "DLT assessment window:", value = 28),
       numericInput("MaxDose", "Max Dose:", value = 4),
       textInput("dose_vec", "Dose Vector (comma-separated):", value = "2, 2, 2, 2, 2, 2"),
@@ -42,6 +41,7 @@ ui <- fluidPage(
       selectInput("type_p_prior", "Type P Prior:", choices = c("uniform", "semiparametric"), selected = "uniform"),
       selectInput("type_t_model", "Type T Model:", choices = c("uniform", "pwuniform", "dhazard", "pwhazard"), selected = "pwuniform"),
       numericInput("type_suspension", "Type of Suspension:", value = 2),
+      numericInput("type_safety", "Type of Safety Rule:", value = 2),
       numericInput("q1", "pi_E for Trial Suspension:", value = 1),
       numericInput("q2", "pi_D for Trial Suspension:", value = 0.15),
       actionButton("compute", "Compute")
@@ -63,8 +63,7 @@ server <- function(input, output) {
     event_vec <- as.numeric(unlist(strsplit(input$event_vec, ",")))
     
     # Call the POD_TPI_prob function
-    result <- POD_TPI_prob(
-      current_dose = input$current_dose,
+    result <- POD_TPI_decision(
       W = input$W,
       MaxDose = input$MaxDose,
       dose_vec = dose_vec,
@@ -80,6 +79,7 @@ server <- function(input, output) {
       type_p_prior = input$type_p_prior,
       type_t_model = input$type_t_model,
       type_suspension = input$type_suspension,
+      type_safety = input$type_safety,
       q1 = input$q1,
       q2 = input$q2
     )

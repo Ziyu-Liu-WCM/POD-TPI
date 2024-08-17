@@ -64,6 +64,34 @@ Suppose n_d is the number of DLT patients observed and m_d is the number of non-
 
 **q2:** pi_D for Trial Suspension, must be within [0, 0.5], <= 0.25 recommended. A smaller pi_D represents more conservative stays.
 
+#### **p_prior Setting**
+The `p_prior` parameter defines the prior distribution for the probability of experiencing a DLT at each dose level. There are two main options for `p_prior`:
+
+- **`p_prior = "uniform"`**: This setting assumes a uniform prior distribution, meaning that initially, all dose levels are considered equally likely to be associated with a DLT. This is a non-informative prior, implying that no strong assumptions are made about the DLT probabilities before observing the data. This approach is often used when there is limited prior knowledge about the toxicity of the doses.
+
+- **`p_prior = "semiparametric"`**: This setting uses a semiparametric prior distribution, which is more flexible and can incorporate prior beliefs or information about the DLT probabilities at different dose levels. In this case, the prior distribution is partially informed by a set of hyperparameters, such as `theta`, which reflects prior knowledge about the true maximum tolerated dose (MTD), and `c`, which controls the strength of this prior belief.
+
+#### **t_model Setting**
+The `t_model` parameter specifies the model used for the time-to-toxicity (the time until a patient experiences a DLT). Different models can be chosen to reflect various assumptions about how the risk of toxicity changes over time:
+
+- **`t_model = "uniform"`**: This setting assumes that the risk of experiencing a DLT is uniformly distributed over the assessment window `W`. In other words, the probability of experiencing a DLT is constant over time.
+
+- **`t_model = "pwuniform"`**: This setting assumes a piecewise-uniform distribution for time-to-toxicity. The assessment window `W` is divided into `K` intervals defined by the vector `h`, and within each interval, the probability of experiencing a DLT is constant but may differ between intervals. This allows the model to capture changes in risk over time more flexibly than the uniform model.
+
+- **`t_model = "dhazard"`**: This setting uses a discrete hazard model for time-to-toxicity. The hazard (or risk) of experiencing a DLT can vary at discrete time points within the assessment window. This model is useful when the risk of DLT might change abruptly at specific times, rather than continuously.
+
+- **`t_model = "pwhazard"`**: This setting assumes a piecewise constant hazard model, where the risk of DLT is constant within each interval defined by `h`, but can change between intervals. This is similar to `pwuniform`, but focuses on the hazard rate rather than the probability of toxicity.
+
+
+
+### Safety Rules
+### Safety Rules
+**Safety rule 1 (early termination)**: At the lowest dose level and any moment in the trial, when there are >= 3 patients with observed outcomes(n_1 + m_1 >= 3), if the probability of the patient having a DLT probability greater than the target probability p_T is greater than 0.95, even counting pending patients as non-DLT, the trial should be terminated: $$\Pr(p_1 > p_T \mid n_1, m_1+r_1) > 0.95$$ 
+
+**Otherwise** if not counting pending patients as non-DLT, the trial should be suspended: $$\Pr(p_1 > p_T \mid n_1, m_1) > 0.95$$
+
+**Safety rule 2 (dose exclusion)**: At any dose level d and any moment in the trial, when there are >= 3 patients with observed outcomes(n_d + m_d >= 3), if the probability of the patient having a DLT probability greater than the target probability p_T is greater than 0.95, Suspend dose d and higher doses from the trial: $$\Pr(p_d > p_T \mid n_d, m_d) > 0.95$$
+
 
 ### Run POD-TPI
 ```
@@ -77,7 +105,17 @@ POD_TPI_df(df, current_dose = 2, W = 28, MaxDose = 4,
            type_safety = 2,
            q1 = 1, q2 = 0.15)
 
-## [1] "Dose decision: De-escalation. Dose assignment for this patient: 1"
+## $Decision
+## [1] "Dose decision: De-escalation. Dose assignment for this patient: 1. Current dose: 2, DLT Patients: 2, Non-DLT Patients: 2, Pending Patients: 2."
+## 
+## $`Probability of De-escalation`
+## [1] 0.6899534
+## 
+## $`Probability of Stay`
+## [1] 0.3100466
+## 
+## $`Probability of Escalation`
+## [1] 0
 ```
 
 ### Output

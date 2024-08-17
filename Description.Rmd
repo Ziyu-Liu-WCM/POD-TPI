@@ -5,12 +5,86 @@ output: html_fragment
 
 ## Introduction
 
-We have proposed the PoD-TPI design to accelerate phase I trials and have developed a statistical methodology to calculate the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes. The posterior distribution directly reflects the confidence of all possible decisions, and the optimal decision is computed under a decision-theoretic framework. The PoD-TPI design is built upon the mTPI-2 design. Nevertheless, the proposed strategy can be applied to other model-free or model-assisted designs such as 3+3, BOIN, keyboard or i3+3.
+We have proposed the PoD-TPI design to accelerate phase I trials and have developed a statistical methodology to calculate the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes. The posterior distribution directly reflects the confidence of all possible decisions, and the optimal decision is computed under a decision-theoretic framework. The **`PoD-TPI`** design is built upon the **`mTPI-2`** design. Nevertheless, the proposed strategy can be applied to the **`i3+3`** design.
 
 
-## User-provided inputs
+## Input Parameters
 
-In dev
+**Current Dose:** Current dose assignment for the incoming patient.
+
+**DLT Assessment Window:** Length of time window for DLT assessment.
+
+**Max Dose:** Max dose level of the trial.
+
+**Dose Vector:** Does level history of the trial, must be comma-separated.
+
+**Event Time Vector:** Time to event history of the trial, must be comma-separated. For non-DLT patients, must be equal to the DLT Assessment Window.
+
+**Event Vector:** Event history of the trial, must be comma-separated. 1 for DLT patients, 0 for non-DLT patients and NA for pending patients.
+
+**DLT Patients:** Number of observed DLT patients.
+
+**non-DLT Patients:** Number of observed non-DLT patients.
+
+**Pending Patients:** Number of pending patients.
+
+**Target DLT Rate:** Target DLT rate of the trial(p_T).
+
+**Type Dose Decision:** Supports both **"mTPI"** and **"i3+3"**, the base complete data dose decision
+
+
+**Type Safety:** Three types of safety rules.
+
+= 0: No safety rule
+
+= 1: Only early termination
+
+= 2: Both safety rules
+
+
+#### **p_prior Setting**
+The `Type P Prior` parameter defines the prior distribution for the probability of experiencing a DLT at each dose level. There are two main options for `p_prior`:
+
+- **`p_prior = "uniform"`**: This setting assumes a uniform prior distribution, meaning that initially, all dose levels are considered equally likely to be associated with a DLT. This is a non-informative prior, implying that no strong assumptions are made about the DLT probabilities before observing the data. This approach is often used when there is limited prior knowledge about the toxicity of the doses.
+
+- **`p_prior = "semiparametric"`**: This setting uses a semiparametric prior distribution, which is more flexible and can incorporate prior beliefs or information about the DLT probabilities at different dose levels. In this case, the prior distribution is partially informed by a set of hyperparameters, such as `theta`, which reflects prior knowledge about the true maximum tolerated dose (MTD), and `c`, which controls the strength of this prior belief.
+
+#### **t_model Setting**
+The `Type T Model` parameter specifies the model used for the time-to-toxicity (the time until a patient experiences a DLT). Different models can be chosen to reflect various assumptions about how the risk of toxicity changes over time:
+
+- **`t_model = "uniform"`**: This setting assumes that the risk of experiencing a DLT is uniformly distributed over the assessment window `W`. In other words, the probability of experiencing a DLT is constant over time.
+
+- **`t_model = "pwuniform"`**: This setting assumes a piecewise-uniform distribution for time-to-toxicity. The assessment window `W` is divided into `K` intervals defined by the vector `h`, and within each interval, the probability of experiencing a DLT is constant but may differ between intervals. This allows the model to capture changes in risk over time more flexibly than the uniform model.
+
+- **`t_model = "dhazard"`**: This setting uses a discrete hazard model for time-to-toxicity. The hazard (or risk) of experiencing a DLT can vary at discrete time points within the assessment window. This model is useful when the risk of DLT might change abruptly at specific times, rather than continuously.
+
+- **`t_model = "pwhazard"`**: This setting assumes a piecewise constant hazard model, where the risk of DLT is constant within each interval defined by `h`, but can change between intervals. This is similar to `pwuniform`, but focuses on the hazard rate rather than the probability of toxicity.
+
+
+**Type of Suspension:** Three types of suspension rules.
+
+= 0: Never suspends
+
+= 1: Suspend if r_d > (n_d + m_d + r_d) / 2 
+
+= 2: Suspend based on probability thresholds
+
+= 3: Suspend if Pr(decision) < 1, i.e., "look-ahead" design
+
+Suppose n_d is the number of DLT patients observed and m_d is the number of non-DLT patients observed and r_d is the number of pending patients
+
+(1) if no observed outcome at current dose (n_d + m_d = 0), always stay.
+    when suspension type is 2, if r_d >= 3 and n_d + m_d = 0, also suspend
+    
+(2) if m_d = 0, no non-DLTs, for suspension rules 0 or 1, if decision is E, change to S.
+    for suspension rule 2, if decision is E, suspend
+    
+    
+**pi_E for Trial Suspension:** must be within [0.33, 1], > 0.8 recommended. A larger pi_E represents more conservative dose escalations.
+
+**pi_D for Trial Suspension:** must be within [0, 0.5], <= 0.25 recommended. A smaller pi_D represents more conservative stays.
+
+
 
 
 ## Output
