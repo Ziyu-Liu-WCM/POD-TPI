@@ -1,7 +1,7 @@
 
 
 # Source the R file containing the function definitions
-source("POD-TPI_prob.R")
+source("POD-TPI_prob_shiny.R")
 source("TITE-setup.R")
 
 
@@ -63,7 +63,7 @@ server <- function(input, output) {
     event_vec <- as.numeric(unlist(strsplit(input$event_vec, ",")))
     
     # Call the POD_TPI_prob function
-    result <- POD_TPI_decision(
+    result <- POD_TPI_decision_shiny(
       W = input$W,
       MaxDose = input$MaxDose,
       dose_vec = dose_vec,
