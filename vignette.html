@@ -354,9 +354,9 @@ these required packages are available on CRAN.</p>
 <div id="pod-tpi-probability-of-decision-toxicity-probability-interval-design-to-accelerate-phase-i-trials" class="section level2">
 <h2>PoD-TPI: Probability-of-Decision Toxicity Probability Interval
 Design to Accelerate Phase I Trials</h2>
-<p>The ‘POD_TPI_prob’ function determines whether
-suspend/de-escalation/stay/escalation should be applied to the current
-dose level by calculating the posterior distribution of a dose
+<p>The <strong><code>POD_TPI_df</code></strong> function determines
+whether suspend/de-escalation/stay/escalation should be applied to the
+current dose level by calculating the posterior distribution of a dose
 assignment decision in the presence of pending toxicity outcomes.</p>
 <div id="example-dataset" class="section level3">
 <h3>Example Dataset</h3>
@@ -514,10 +514,10 @@ greater than 0.95, Suspend dose d and higher doses from the trial: <span class="
 ## [1] &quot;Dose decision: De-escalation. Dose assignment for this patient: 1. Current dose: 2, DLT Patients: 2, Non-DLT Patients: 2, Pending Patients: 2.&quot;
 ## 
 ## $`Probability of De-escalation`
-## [1] 0.6902344
+## [1] 0.705834
 ## 
 ## $`Probability of Stay`
-## [1] 0.3097656
+## [1] 0.294166
 ## 
 ## $`Probability of Escalation`
 ## [1] 0</code></pre>

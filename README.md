@@ -2,13 +2,13 @@
 
 ### Introduction
 
-We have proposed the PoD-TPI design to accelerate phase I trials and have developed a statistical methodology to calculate the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes. The posterior distribution directly reflects the confidence of all possible decisions, and the optimal decision is computed under a decision-theoretic framework. The PoD-TPI design is built upon the mTPI-2 design. Nevertheless, the proposed strategy can be applied to other model-free or model-assisted designs such as 3+3, BOIN, keyboard or i3+3.
+We have proposed the PoD-TPI design to accelerate phase I trials and have developed a statistical methodology to calculate the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes. The posterior distribution directly reflects the confidence of all possible decisions, and the optimal decision is computed under a decision-theoretic framework. The **`PoD-TPI`** design is built upon the **`mTPI-2`** design. Nevertheless, the proposed strategy can be applied to the **`i3+3`** design.
 
 
 ### Example Dataset 
-We will use the dataset in the Fig.1(a) of the PoD-TPI paper. The input dataset 'df' should include at least three columns: 'dose', 'event_time' and 'event'. Suppose that you are assigning a dose level to the nth patient of the trial, the 'dose' column should contain the dose level history of all past (n-1) patients and the 'event_time' column should contain the time to event(DLT here) observed for all past (n-1) patients, and the 'event' column should contain whether event is observed on each patient.
+We will use a dataset similar to the one in the Fig.1(a) of the PoD-TPI paper. The input dataset **`df`** should include at least three columns: **`dose`**, **`event_time`** and **`event`**. Suppose that you are assigning a dose level to the nth patient of the trial, the 'dose' column should contain the dose level history of all past (n-1) patients and the 'event_time' column should contain the time to event(DLT here) observed for all past (n-1) patients, and the 'event' column should contain whether event is observed on each patient.
 
-There are several restrictions here. First, The input dataset should be arranged according to the order of patient recruitment. Patients recruited later need to be placed later in the dataset. Second, the 'event_time' variable must be less than or equal to the DLT assessment window. If DLT is not observed on a patient within the assessment window, the event_time should be equal to assessment window. Third, for patients with pending outcomes, their 'event' variable should be NA and their 'event_time' variables are the pending follow-up times.
+There are several restrictions here. First, The input dataset should be arranged according to the order of patient recruitment. Patients recruited later need to be placed later in the dataset. Second, the **`event_time`** variable must be less than or equal to the DLT assessment window. If DLT is not observed on a patient within the assessment window, the event_time should be equal to assessment window. Third, for patients with pending outcomes, their **`event`** variable should be NA and their **`event_time`** variables are the pending follow-up times.
 
 ```
 df <- data.frame(dose = c(1, 2, 2, 2, 2, 2),

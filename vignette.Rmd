@@ -18,7 +18,7 @@ The following packages are required for functions and examples in the XXX packag
 
 
 ## PoD-TPI: Probability-of-Decision Toxicity Probability Interval Design to Accelerate Phase I Trials
-The **`POD_TPI_prob`** function determines whether suspend/de-escalation/stay/escalation should be applied to the current dose level by calculating the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes.
+The **`POD_TPI_df`** function determines whether suspend/de-escalation/stay/escalation should be applied to the current dose level by calculating the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes.
 
 ```{r, include = FALSE}
 source("POD-TPI_prob.R")
