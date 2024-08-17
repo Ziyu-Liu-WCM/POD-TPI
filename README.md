@@ -85,7 +85,6 @@ The `t_model` parameter specifies the model used for the time-to-toxicity (the t
 
 
 ### Safety Rules
-### Safety Rules
 **Safety rule 1 (early termination)**: At the lowest dose level and any moment in the trial, when there are >= 3 patients with observed outcomes(n_1 + m_1 >= 3), if the probability of the patient having a DLT probability greater than the target probability p_T is greater than 0.95, even counting pending patients as non-DLT, the trial should be terminated: $$\Pr(p_1 > p_T \mid n_1, m_1+r_1) > 0.95$$ 
 
 **Otherwise** if not counting pending patients as non-DLT, the trial should be suspended: $$\Pr(p_1 > p_T \mid n_1, m_1) > 0.95$$
