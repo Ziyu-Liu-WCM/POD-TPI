@@ -4,6 +4,7 @@
 
 We have proposed the PoD-TPI design to accelerate phase I trials and have developed a statistical methodology to calculate the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes. The posterior distribution directly reflects the confidence of all possible decisions, and the optimal decision is computed under a decision-theoretic framework. The **`PoD-TPI`** design is built upon the **`mTPI-2`** design. Nevertheless, the proposed strategy can be applied to the **`i3+3`** design.
 
+This repository is based on the article: Zhou, T., Guo, W. & Ji, Y. PoD-TPI: Probability-of-Decision Toxicity Probability Interval Design to Accelerate Phase I Trials. Stat Biosci 12, 124–145 (2020).
 
 ### Example Dataset 
 We will use a dataset similar to the one in the Fig.1(a) of the PoD-TPI paper. The input dataset **`df`** should include at least three columns: **`dose`**, **`event_time`** and **`event`**. Suppose that you are assigning a dose level to the nth patient of the trial, the 'dose' column should contain the dose level history of all past (n-1) patients and the 'event_time' column should contain the time to event(DLT here) observed for all past (n-1) patients, and the 'event' column should contain whether event is observed on each patient.
