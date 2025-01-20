@@ -1,5 +1,7 @@
 ## PoD-TPI: Probability-of-Decision Toxicity Probability Interval Design to Accelerate Phase I Trials
 
+![R-CMD-check](https://github.com/Ziyu-Liu-WCM/POD-TPI/actions/workflows/R-CMD-check.yml/badge.svg)
+
 ### Introduction
 
 We have proposed the PoD-TPI design to accelerate phase I trials and have developed a statistical methodology to calculate the posterior distribution of a dose assignment decision in the presence of pending toxicity outcomes. The posterior distribution directly reflects the confidence of all possible decisions, and the optimal decision is computed under a decision-theoretic framework. The **`PoD-TPI`** design is built upon the **`mTPI-2`** design. Nevertheless, the proposed strategy can be applied to the **`i3+3`** design.
