@@ -97,7 +97,7 @@ The `t_model` parameter specifies the model used for the time-to-toxicity (the t
 
 ### Run POD-TPI
 ```
-POD_TPI_df(df, current_dose = 2, W = 28, MaxDose = 4,
+POD_TPI_df(df, W = 28, MaxDose = 4,
            p_T = 0.3, epsilon = c(0.05, 0.05), 
            niter = 1000,
            type_dose_decision = "mTPI",
